@@ -7,7 +7,7 @@ import hmac
 from io import BytesIO
 import os
 
-secret_file = 'secret.cfg'
+secret_file = '/home/bobirdmi/MIPYTBotTMP/config/secret.cfg'
 app = Flask(__name__)
 
 
