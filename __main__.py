@@ -14,7 +14,7 @@ def cli():
 def web():
     """Run the web app"""
     # click.echo('Running the web app')
-    web_app.run_web()
+    web_app.run_local_web()
 
 
 @cli.command()
