@@ -23,7 +23,7 @@ def hook():
     verify_signature(conf['github']['secret_token'],
                     #os.environ['SECRET_TOKEN'],
                      request.headers['X-Hub-Signature'],
-                     request.body)
+                     request.data)
 
     data = request.get_json()
     return ''
