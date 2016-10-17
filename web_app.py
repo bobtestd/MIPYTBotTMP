@@ -30,7 +30,7 @@ def hook():
     # return data
 
 
-def verify_signature(secret: str, signature: str, resp_body: BytesIO) -> None:
+def verify_signature(secret: str, signature: str, resp_body) -> None:
     """Verify HMAC-SHA1 signature of the given response body.
     The signature is expected to be in format ``sha1=<hex-digest>``.
     """
@@ -45,7 +45,7 @@ def verify_signature(secret: str, signature: str, resp_body: BytesIO) -> None:
         raise("Error: expected type sha1, but got %s" % alg)
 
     computed_digest = hmac.new(secret.encode('utf-8'),
-                               msg=resp_body.getbuffer(),
+                               msg=resp_body,
                                digestmod=hashlib.sha1).hexdigest()
 
     if not hmac.compare_digest(computed_digest, digest):
