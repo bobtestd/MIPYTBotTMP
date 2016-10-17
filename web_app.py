@@ -20,7 +20,7 @@ def index(some_name='fsdfdsf'):
 def hook():
     conf = configparser.ConfigParser()
     conf.read(secret_file)
-    verify_signature(conf['secret_token'],
+    verify_signature(conf['github']['secret_token'],
                     #os.environ['SECRET_TOKEN'],
                      request.get_header('X-Hub-Signature'),
                      request.body)
