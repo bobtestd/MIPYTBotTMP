@@ -1,11 +1,13 @@
 from flask import Flask
 from flask import render_template
 from flask import request
+import configparser
 import hashlib
 import hmac
 from io import BytesIO
 import os
 
+secret_file = 'secret.cfg'
 app = Flask(__name__)
 
 
@@ -16,7 +18,10 @@ def index(some_name='fsdfdsf'):
 
 @app.route('/hook', methods=['POST'])
 def hook():
-    verify_signature(os.environ['SECRET_TOKEN'],
+    conf = configparser.ConfigParser()
+    conf.read(secret_file)
+    verify_signature(conf['secret_token'],
+                    #os.environ['SECRET_TOKEN'],
                      request.get_header('X-Hub-Signature'),
                      request.body)
 
