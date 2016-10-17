@@ -22,7 +22,7 @@ def hook():
     conf.read(secret_file)
     verify_signature(conf['github']['secret_token'],
                     #os.environ['SECRET_TOKEN'],
-                     request.get_header('X-Hub-Signature'),
+                     request.headers('X-Hub-Signature'),
                      request.body)
 
     data = request.get_json()
