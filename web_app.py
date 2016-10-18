@@ -33,8 +33,8 @@ def hook():
     bot = github_bot.GitHubBot(auth_file, label_file, None, 'default')
     bot.label_issue(request.get_json()['issue'])
 
-    return [request.get_json()['issue']['url'], request.get_json()['issue']['title'],
-            request.get_json()['issue']['body'], request.get_json()['issue']['labels']]
+    return str(request.get_json()['issue']['url']) + ', ' +  str(request.get_json()['issue']['title']) + ', ' \
+           + str(request.get_json()['issue']['body']) + ', ' + str(request.get_json()['issue']['labels'])
 
 
 def verify_signature(secret: str, signature: str, resp_body) -> None:
