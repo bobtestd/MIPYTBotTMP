@@ -9,9 +9,17 @@ import markdown
 
 
 web_config_file = '/home/bobirdmi/MIPYTBotTMP/config/web.cfg'
-readme_file = '/home/bobirdmi/MIPYTBotTMP/README.md'
-# readme_file = './README.md'
 app = Flask(__name__)
+
+# read web configurations
+conf = configparser.ConfigParser()
+conf.read(web_config_file)
+secret_file = conf['github']['secret_file']
+auth_file = conf['github']['auth_file']
+label_file = conf['github']['label_file']
+readme_file = conf['github']['readme_file']
+
+conf.read(secret_file)
 
 
 @app.route('/')
@@ -24,15 +32,6 @@ def index():
 
 @app.route('/hook', methods=['POST'])
 def hook():
-    conf = configparser.ConfigParser()
-    conf.read(web_config_file)
-
-    secret_file = conf['github']['secret_file']
-    auth_file = conf['github']['auth_file']
-    label_file = conf['github']['label_file']
-
-    conf.read(secret_file)
-
     verify_signature(conf['github']['secret_token'],
                      request.headers['X-Hub-Signature'],
                      request.data)
