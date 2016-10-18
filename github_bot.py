@@ -54,9 +54,7 @@ class GitHubBot:
                              issue_info['body'], label_comments)
 
     def label_issue(self, issue_info):
-        if issue_info['labels']:
-            pass
-        else:
+        if not issue_info['labels']:
             self._set_labels(issue_info['url'],
                              issue_info['title'],
                              issue_info['body'], False)
