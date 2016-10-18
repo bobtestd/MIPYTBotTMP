@@ -9,3 +9,5 @@ __pycache__/
 # Config file
 config/auth.cfg
 
+# Log files
+*.log
