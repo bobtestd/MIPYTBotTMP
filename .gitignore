@@ -6,6 +6,4 @@ __pycache__/
 # IDEA
 .idea/
 
-# Config file
 config/auth.cfg
-
