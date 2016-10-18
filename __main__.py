@@ -37,12 +37,12 @@ def console(auth_file, label_file, user, repo, period, deflabel, comments):
     url = 'https://api.github.com/repos/' + user + '/' + repo + '/issues'
     bot = github_bot.GitHubBot(click.format_filename(auth_file),
                                click.format_filename(label_file),
-                               url, period, deflabel)
+                               url, deflabel)
 
     my_scheduler = sched.scheduler(time.time, time.sleep)
 
     def repeated_labeling(sc):
-        bot.label_issues(comments)
+        bot.label_all_issues(comments)
 
         print(10 * '=')
         print("Labeling in", period, "seconds...")

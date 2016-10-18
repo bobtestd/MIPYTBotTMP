@@ -2,14 +2,27 @@ import requests
 import json
 import configparser
 import re
+import logging
+
+
+logging.basicConfig(filename='github_bot.log', level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
 
 class GitHubBot:
-    def __init__(self, auth_file, label_file, url, period, default_label):
+    def __init__(self, auth_file, label_file, url, default_label):
+        """
+        A constructor.
+
+        :param auth_file: path to file with authorization info.
+        :param label_file: path to file with issue labels and their rules.
+        :param url: Url of issues in repo (ex.: https://api.github.com/repos/<username>/<repo>/issues).
+        If you want to label ALL issues in this repo, you MUST specify this parameter. Otherwise,
+        set it to None in case of labeling only one issue.
+        :param default_label: If no rule can be applied to issue, an issue will be labeled by this string.
+        """
         self._read_config(auth_file, label_file)
 
         self.url = url
-        self.period = period
         self.default_label = default_label
 
         self._session = requests.Session()
@@ -22,13 +35,13 @@ class GitHubBot:
         self._token = conf['github']['token']
 
         self._label_list = list(map(str.strip, conf['list']['labels'].split(',')))
-        print("List of defined labels:", self._label_list)
+        logging.debug("List of defined labels:", self._label_list)
 
         self._label_rules = []
         for label in self._label_list:
             self._label_rules.append(conf['rules'][label])
 
-    def label_issues(self, label_comments):
+    def label_all_issues(self, label_comments):
         r = self._session.get(self.url)
         r.raise_for_status()
 
@@ -36,10 +49,20 @@ class GitHubBot:
             if issue_info['labels']:
                 continue
 
-            self._set_labels(issue_info['number'], issue_info['title'], issue_info['body'], label_comments)
+            self._set_labels(self.url + '/' + str(issue_info['number']),
+                             issue_info['title'],
+                             issue_info['body'], label_comments)
 
-    def _set_labels(self, issue_num, title, body, label_comments):
-        issue_url = self.url + '/' + str(issue_num)
+    def label_issue(self, issue_info, label_comments):
+        if issue_info['labels']:
+            pass
+        else:
+            self._set_labels(issue_info['url'],
+                             issue_info['title'],
+                             issue_info['body'], label_comments)
+
+    def _set_labels(self, issue_url, title, body, label_comments):
+        # issue_url = self.url + '/' + str(issue_num)
         text = title + " " + body
 
         if label_comments:
@@ -54,16 +77,15 @@ class GitHubBot:
             if re.search(rule, text):
                 labels.append(label_text)
 
-        print(10 * '-')
-        print('Issue number:', issue_num)
-        print('Issue title:', title)
-        print('Issue url:', issue_url)
+        logging.debug(10 * '-')
+        # logging.debug('Issue number:', issue_num)
+        logging.debug('Issue url:', issue_url)
+        logging.debug('Issue title:', title)
 
         if not labels:
             labels.append(self.default_label)
 
-        print("Labeled as:", labels)
+        logging.debug("Labeled as:", labels)
 
         r = self._session.post(issue_url + '/labels', data=json.dumps(labels))
-        print('Status code:', r.status_code)
-
+        logging.debug('Status code:', r.status_code)

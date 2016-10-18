@@ -4,10 +4,13 @@ from flask import request
 import configparser
 import hashlib
 import hmac
-from io import BytesIO
 import os
+import github_bot
 
-secret_file = '/home/bobirdmi/MIPYTBotTMP/config/secret.cfg'
+config_path = '/home/bobirdmi/MIPYTBotTMP/config/'
+secret_file = config_path + 'secret.cfg'
+auth_file = config_path + 'auth.cfg'
+label_file = config_path + 'label.cfg'
 app = Flask(__name__)
 
 
@@ -25,9 +28,12 @@ def hook():
                      request.headers['X-Hub-Signature'],
                      request.data)
 
-    data = request.get_json()
+    # data = request.get_json()
+
+    bot = github_bot.GitHubBot(auth_file, label_file, None, 'default')
+    bot.label_issue(request.get_json()['issue'], True)
+
     return ''
-    # return data
 
 
 def verify_signature(secret: str, signature: str, resp_body) -> None:
@@ -37,11 +43,9 @@ def verify_signature(secret: str, signature: str, resp_body) -> None:
     try:
         alg, digest = signature.lower().split('=', 1)
     except (ValueError, AttributeError):
-        # raise InvalidSignatureError('signature is malformed')
         raise 'Error: signature is malformed'
 
     if alg != 'sha1':
-        # raise InvalidSignatureError("expected type sha1, but got %s" % alg)
         raise("Error: expected type sha1, but got %s" % alg)
 
     computed_digest = hmac.new(secret.encode('utf-8'),
@@ -49,19 +53,9 @@ def verify_signature(secret: str, signature: str, resp_body) -> None:
                                digestmod=hashlib.sha1).hexdigest()
 
     if not hmac.compare_digest(computed_digest, digest):
-        # raise InvalidSignatureError('digests do not match')
         raise 'Error: digests do not match'
 
 
 def run_local_web():
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.run(debug=True)
-
-
-# class InvalidSignatureError(HTTPError):
-#     def __init__(self, message: str, **kwargs) -> None:
-#         msg = "Invalid X-Hub-Signature: %s" % message
-#         super().__init__(status=403, body=msg, **kwargs)
-
-if __name__ == '__main__':
-    run_local_web()
