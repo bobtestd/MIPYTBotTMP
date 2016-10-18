@@ -31,7 +31,7 @@ def hook():
     # data = request.get_json()
 
     bot = github_bot.GitHubBot(auth_file, label_file, None, 'default')
-    bot.label_issue(request.get_json()['issue'], True)
+    bot.label_issue(request.get_json()['issue'])
 
     return ''
 

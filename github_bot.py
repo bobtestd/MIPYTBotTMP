@@ -53,13 +53,13 @@ class GitHubBot:
                              issue_info['title'],
                              issue_info['body'], label_comments)
 
-    def label_issue(self, issue_info, label_comments):
+    def label_issue(self, issue_info):
         if issue_info['labels']:
             pass
         else:
             self._set_labels(issue_info['url'],
                              issue_info['title'],
-                             issue_info['body'], label_comments)
+                             issue_info['body'], False)
 
     def _set_labels(self, issue_url, title, body, label_comments):
         # issue_url = self.url + '/' + str(issue_num)
