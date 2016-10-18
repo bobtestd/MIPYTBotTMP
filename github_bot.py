@@ -60,7 +60,6 @@ class GitHubBot:
                              issue_info['body'], False)
 
     def _set_labels(self, issue_url, title, body, label_comments):
-        # issue_url = self.url + '/' + str(issue_num)
         text = title + " " + body
 
         if label_comments:
@@ -76,7 +75,6 @@ class GitHubBot:
                 labels.append(label_text)
 
         logging.debug(10 * '-')
-        # logging.debug('Issue number:', issue_num)
         logging.debug('Issue url:', issue_url)
         logging.debug('Issue title:', title)
 
