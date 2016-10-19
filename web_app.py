@@ -36,11 +36,13 @@ def hook():
                      request.headers['X-Hub-Signature'],
                      request.data)
 
-    bot = github_bot.GitHubBot(auth_file, label_file, None, 'default')
-    bot.label_issue(request.get_json()['issue'])
+    if request.get_json()['action'] == 'opened':
+        bot = github_bot.GitHubBot(auth_file, label_file, None, 'default')
+        bot.label_issue(request.get_json()['issue'])
 
     return str(request.get_json()['issue']['url']) + ', ' +  str(request.get_json()['issue']['title']) + ', ' \
-           + str(request.get_json()['issue']['body']) + ', ' + str(request.get_json()['issue']['labels'])
+           + str(request.get_json()['issue']['body']) + ', ' + str(request.get_json()['issue']['labels']) + ', ' \
+           + str(request.get_json()['action'])
 
 
 @app.template_filter('markdown')
