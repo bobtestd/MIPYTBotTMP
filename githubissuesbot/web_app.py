@@ -37,8 +37,8 @@ conf = configparser.ConfigParser()
 # if it is running on pythonanywhere (maybe that code works for others hosts)
 if 'liveweb' in gethostname():
     # set "web_config_file" variable to file with web configuration
-    # format: /home/<username>/<project_name>/path/to/webcfg.cfg
-    web_config_file = '/home/bobirdmi/MIPYTBotTMP/config/web.cfg'
+    # format: /home/<username>/<project_name>/<package_name>/path/to/webcfg.cfg
+    web_config_file = '/home/bobirdmi/MIPYTBotTMP/githubissuesbot/config/web.cfg'
     # read web configurations
     _read_web_config()
 
