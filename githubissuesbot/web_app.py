@@ -4,7 +4,6 @@ from flask import request
 import configparser
 import hashlib
 import hmac
-from . import github_bot
 import markdown
 import appdirs
 from socket import gethostname
@@ -36,11 +35,15 @@ conf = configparser.ConfigParser()
 
 # if it is running on pythonanywhere (maybe that code works for others hosts)
 if 'liveweb' in gethostname():
+    import github_bot
+
     # set "web_config_file" variable to file with web configuration
     # format: /home/<username>/<project_name>/<package_name>/path/to/webcfg.cfg
     web_config_file = '/home/bobirdmi/MIPYTBotTMP/githubissuesbot/config/web.cfg'
     # read web configurations
     _read_web_config()
+else:
+    from . import github_bot
 
 
 @app.route('/')
