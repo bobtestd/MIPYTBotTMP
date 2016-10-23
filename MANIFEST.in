@@ -1,0 +1,5 @@
+include LICENSE
+include githubissuesbot/config/*.sample
+include githubissuesbot/config/label.cfg
+include githubissuesbot/config/web.cfg
+include githubissuesbot/templates/*

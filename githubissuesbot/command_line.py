@@ -1,8 +1,9 @@
 import click
-import github_bot
-import web_app
+from . import github_bot
+from . import web_app
 import sched
 import time
+import appdirs
 
 
 @click.group()
@@ -11,10 +12,12 @@ def cli():
 
 
 @cli.command()
-def web():
+@click.option('-c', '--config',
+              help='Set path to a file with web configuration. '
+                   'Default path: ' + appdirs.site_config_dir(appname=__name__.split('.')[0]) + '/web.cfg')
+def web(config):
     """Run the web app"""
-    # click.echo('Running the web app')
-    web_app.run_local_web()
+    web_app.run_local_web(config)
 
 
 @cli.command()
@@ -52,4 +55,5 @@ def console(auth_file, label_file, user, repo, period, deflabel, comments):
     my_scheduler.run()
 
 
-cli()
+def main():
+    cli(prog_name='githubissuesbot')

@@ -4,22 +4,43 @@ from flask import request
 import configparser
 import hashlib
 import hmac
-import github_bot
+from . import github_bot
 import markdown
+import appdirs
+from socket import gethostname
 
 
-web_config_file = '/home/bobirdmi/MIPYTBotTMP/config/web.cfg'
-app = Flask(__name__)
+def _read_web_config():
+    global conf
+    conf.read(web_config_file)
 
-# read web configurations
+    global secret_file
+    secret_file = conf['github']['secret_file']
+
+    global auth_file
+    auth_file = conf['github']['auth_file']
+
+    global label_file
+    label_file = conf['github']['label_file']
+
+    global readme_file
+    readme_file = conf['github']['readme_file']
+
+    # read file with a secret token for webhook
+    conf.read(secret_file)
+
+
+app_name = __name__.split('.')[0]
+app = Flask(app_name)
 conf = configparser.ConfigParser()
-conf.read(web_config_file)
-secret_file = conf['github']['secret_file']
-auth_file = conf['github']['auth_file']
-label_file = conf['github']['label_file']
-readme_file = conf['github']['readme_file']
 
-conf.read(secret_file)
+# if it is running on pythonanywhere (maybe that code works for others hosts)
+if 'liveweb' in gethostname():
+    # set "web_config_file" variable to file with web configuration
+    # format: /home/<username>/<project_name>/path/to/webcfg.cfg
+    web_config_file = '/home/bobirdmi/MIPYTBotTMP/config/web.cfg'
+    # read web configurations
+    _read_web_config()
 
 
 @app.route('/')
@@ -71,6 +92,15 @@ def verify_signature(secret: str, signature: str, resp_body) -> None:
         raise 'Error: digests do not match'
 
 
-def run_local_web():
+def run_local_web(web_config):
+    global web_config_file
+    if web_config:
+        web_config_file = web_config
+    else:
+        web_config_file = appdirs.site_config_dir(appname=app_name) + '/web.cfg'
+
+    # read web configuration
+    _read_web_config()
+
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.run(debug=True)
