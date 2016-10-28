@@ -27,12 +27,10 @@ var/
 # Config file
 githubissuesbot/config/auth.cfg
 githubissuesbot/config/web.cfg
-
-tmpconfig/
+githubissuesbot/config/secret.cfg
 
 # Log files
 **/.log
 
 # README for PyPi
-README.txt
 githubissuesbot/README.md
