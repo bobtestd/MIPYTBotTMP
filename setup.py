@@ -1,28 +1,16 @@
 from setuptools import setup, find_packages
 
 
-long_description = ''
+with open('githubissuesbot/README.md', 'w') as file_out:
+    with open('README.md', 'r') as file_in:
+        file_out.write(file_in.read())
 
-try:
-    import pypandoc
-    from pypandoc.pandoc_download import download_pandoc
-
-    download_pandoc()
-
-    pypandoc.convert_file('README.md', 'rst', outputfile='README.rst')
-    with open('README.rst', 'r') as file:
-        long_description = file.read()
-except (ImportError,RuntimeError) as e:
-    print('Warning: ' + str(e) + ': could not convert Markdown to RST.')
-
-    with open('README.txt', 'w') as file_out:
-        with open('README.md', 'r') as file_in:
-            long_description = file_in.read()
-            file_out.write(long_description)
+with open('README.rst', 'r') as file:
+    long_description = file.read()
 
 setup(
     name='githubissuesbot',
-    version='0.3',
+    version='0.3.2',
     description='GitHub issues bot as console and web app.',
     long_description=long_description,
     author='Dmitriy Bobir',
@@ -31,11 +19,17 @@ setup(
     keywords='github,bot,issues',
     license='Public Domain',
     packages=find_packages(),
-    setup_requires=['pypandoc>=1'],
     install_requires=['Flask', 'markdown>=2', 'click>=6', 'requests>=2', 'appdirs>=1'],
     entry_points={
             'console_scripts': [
-                'githubbot = githubissuesbot.command_line:main',
+                'githubissuesbot = githubissuesbot.command_line:main',
+            ],
+    },
+    package_data={
+            'githubissuesbot': [
+                'config/*',
+                'templates/*.html',
+                'README.md'
             ],
     },
     classifiers=[
@@ -53,3 +47,4 @@ setup(
         'Topic :: Software Development :: Libraries',
         ],
 )
+

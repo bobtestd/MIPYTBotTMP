@@ -4,6 +4,11 @@ from . import web_app
 import sched
 import time
 import appdirs
+import pkg_resources
+import os
+
+
+app_name = __name__.split('.')[0]
 
 
 @click.group()
@@ -12,9 +17,24 @@ def cli():
 
 
 @cli.command()
+@click.option('-d', '--directory', default='./',
+              help='Set directory the web config files will be created in. '
+                   'Default directory: ./')
+def genconf(directory):
+    """Generate sample web config files"""
+    os.makedirs(os.path.dirname(directory + '/somefile.example'), exist_ok=True)
+    click.echo('Generating sample web config files...')
+    create_web_config(directory, 'label.cfg')
+    create_web_config(directory, 'auth.cfg.sample')
+    create_web_config(directory, 'secret.cfg.sample')
+    create_web_config(directory, 'web.cfg.sample')
+    click.echo('Done')
+
+
+@cli.command()
 @click.option('-c', '--config',
               help='Set path to a file with web configuration. '
-                   'Default path: ' + appdirs.site_config_dir(appname=__name__.split('.')[0]) + '/web.cfg')
+                   'Default path: ' + appdirs.site_config_dir(appname=app_name) + '/web.cfg')
 def web(config):
     """Run the web app"""
     web_app.run_local_web(config)
@@ -55,5 +75,10 @@ def console(auth_file, label_file, user, repo, period, deflabel, comments):
     my_scheduler.run()
 
 
+def create_web_config(new_dir, filename):
+    with open(new_dir + '/' + filename, 'wb') as f:
+        f.write(pkg_resources.resource_string(app_name, '/config/' + filename))
+
+
 def main():
-    cli(prog_name='githubissuesbot')
+    cli(prog_name=app_name)
