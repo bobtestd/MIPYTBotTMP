@@ -79,17 +79,17 @@ def verify_signature(secret: str, signature: str, resp_body) -> None:
     try:
         alg, digest = signature.lower().split('=', 1)
     except (ValueError, AttributeError):
-        raise 'Error: signature is malformed'
+        raise Exception('Error: signature is malformed')
 
     if alg != 'sha1':
-        raise("Error: expected type sha1, but got %s" % alg)
+        raise Exception("Error: expected type sha1, but got %s" % alg)
 
     computed_digest = hmac.new(secret.encode('utf-8'),
                                msg=resp_body,
                                digestmod=hashlib.sha1).hexdigest()
 
     if not hmac.compare_digest(computed_digest, digest):
-        raise 'Error: digests do not match'
+        raise Exception('Error: digests do not match')
 
 
 def run_local_web(web_config):

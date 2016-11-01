@@ -43,3 +43,12 @@ manually fix **web_config_file** value in **web_app.py** on line 39.
 Link to `testpypi <https://testpypi.python.org/pypi/githubissuesbot>`__
 
 Type --help for command line manual.
+
+Running tests
+~~~~~~~~~~~~~
+
+You may run tests by typing **python setup.py test**.
+
+You must have file **./tests/fixtures/auth.cfg.truetoken.test**, if you want to rewrite
+`betamax <https://pypi.python.org/pypi/betamax>`__ cassettes.
+

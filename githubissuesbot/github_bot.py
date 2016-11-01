@@ -9,30 +9,37 @@ logging.basicConfig(filename='github_bot.log', level=logging.INFO, format='%(asc
 
 
 class GitHubBot:
-    def __init__(self, auth_file, label_file, url, default_label):
+    def __init__(self, auth_file, label_file, url, default_label, session=None, auth_token=None):
         """
         A constructor.
 
-        :param auth_file: path to file with authorization info.
+        :param auth_file: path to file with authorization info. If you don't want to read file, you may use auth_token.
         :param label_file: path to file with issue labels and their rules.
         :param url: Url of issues in repo (ex.: https://api.github.com/repos/<username>/<repo>/issues).
         If you want to label ALL issues in this repo, you MUST specify this parameter. Otherwise,
         set it to None in case of labeling only one issue.
         :param default_label: If no rule can be applied to issue, an issue will be labeled by this string.
+        :param session: Session for handling network communication. If it is None, requests.Session() will be invoked.
+        :param auth_token: GitHub Personal Access Token. If it is None, the auth_file will be read. Otherwise, the
+        value of this variable will be used for authorization and auth_file parameter will be ignored.
         """
-        self._read_config(auth_file, label_file)
+        self._read_config(auth_file, auth_token, label_file)
 
         self.url = url
         self.default_label = default_label
 
-        self._session = requests.Session()
+        self._session = session or requests.Session()
         self._session.headers = {'Authorization': 'token ' + self._token, 'User-Agent': 'Python'}
 
-    def _read_config(self, auth_file, label_file):
+    def _read_config(self, auth_file, auth_token, label_file):
         conf = configparser.ConfigParser()
-        conf.read([auth_file, label_file])
 
-        self._token = conf['github']['token']
+        if auth_token:
+            conf.read(label_file)
+            self._token = auth_token
+        else:
+            conf.read([auth_file, label_file])
+            self._token = conf['github']['token']
 
         self._label_list = list(map(str.strip, conf['list']['labels'].split(',')))
         logging.debug("List of defined labels:", self._label_list)
@@ -45,19 +52,24 @@ class GitHubBot:
         r = self._session.get(self.url)
         r.raise_for_status()
 
+        results = {}
+
         for issue_info in r.json():
             if issue_info['labels']:
                 continue
 
-            self._set_labels(self.url + '/' + str(issue_info['number']),
-                             issue_info['title'],
-                             issue_info['body'], label_comments)
+            results[issue_info['number']] = self._set_labels(self.url + '/' + str(issue_info['number']),
+                                                             issue_info['title'],
+                                                             issue_info['body'],
+                                                             label_comments)
+
+        return results
 
     def label_issue(self, issue_info):
         if not issue_info['labels']:
-            self._set_labels(issue_info['url'],
-                             issue_info['title'],
-                             issue_info['body'], False)
+            return self._set_labels(issue_info['url'],
+                                    issue_info['title'],
+                                    issue_info['body'], False)
 
     def _set_labels(self, issue_url, title, body, label_comments):
         text = title + " " + body
@@ -85,3 +97,5 @@ class GitHubBot:
 
         r = self._session.post(issue_url + '/labels', data=json.dumps(labels))
         logging.debug('Status code:', r.status_code)
+
+        return [labels, r.status_code]

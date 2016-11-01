@@ -18,4 +18,7 @@ If you want to deploy this app on some host (tested on [pythonanywhere](https://
 
 Link to [testpypi](https://testpypi.python.org/pypi/githubissuesbot).
 
+### Running tests
+You may run tests by typing **python setup.py test**.
 
+You must have file **./tests/fixtures/auth.cfg.truetoken.test**, if you want to rewrite [betamax](https://pypi.python.org/pypi/betamax) cassettes.
